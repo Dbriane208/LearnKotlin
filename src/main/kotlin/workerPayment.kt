@@ -26,12 +26,17 @@ fun overtimePay (noOfHours: Double,rateOfPay: Double) : Double{
         return 0.0
     }
 }
-fun netSalary (rateOfPay: Double,noOfHours: Double,nssfAmount: Double) : Double{
+fun netSalary (rateOfPay: Double,noOfHours: Double,nssfAmount: Double) : Any{
 
     val grossSalary = grossSalary(rateOfPay,noOfHours)
     val paye = grossSalary * 0.15
 
-    return grossSalary - nssfAmount - paye
+    if(nssfAmount > grossSalary){
+        return grossSalary - paye
+    }else{
+        return grossSalary - nssfAmount - paye
+    }
+
 }
 
 data class userInput (
@@ -74,6 +79,6 @@ fun main() {
         println("Your Gross Salary is : $grossSalary")
 
         val netSalary = netSalary(rateOfPay , noOfHours , nssfAmount)
-        println("Your  netPay is : $netSalary ")
+        println("Your  Net Salary is : $netSalary ")
 
 }
