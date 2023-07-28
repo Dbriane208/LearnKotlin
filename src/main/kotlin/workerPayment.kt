@@ -1,4 +1,7 @@
+import java.lang.NumberFormatException
 import java.util.*
+import javax.management.ValueExp
+
 fun workerRegistration (name : String ,rateOfPay : Double ,noOfHours : Double , nssfAmount : Double){
 
     println("Enter your name : $name")
@@ -45,22 +48,42 @@ data class userInput (
     val workerHours : Double,
     val nssfAmount: Double
 )
-fun getUserInput() : userInput{
+
+fun verifyName() : String{
+
     val scan = Scanner(System.`in`)
 
     println("Enter your name : ")
-    val workerName = readln()
+    val workerName  = scan.nextLine()
 
-    println("Enter your rate of Pay  : ")
-    val workerRateOfPay = scan.nextDouble()
+    if(!workerName.matches(Regex("^[a-zA-Z]*$"))){
+        return "null"
+    }else{
+      return  workerName
+    }
+}
+fun getUserInput() : userInput{
 
-    println("Enter number of hours worked : ")
-    val workerHours = scan.nextDouble()
+        val scan = Scanner(System.`in`)
 
-    println("Enter the NSSF Amount: ")
-    val nssfAmount = scan.nextDouble()
+        val workerName  = verifyName()
+        if (workerName == "null"){
+            println("Name must be a String! eg. Daniel")
+            System.exit(0)
+        }else{
+            workerName
+        }
 
-    return userInput(workerName,workerRateOfPay,workerHours,nssfAmount)
+        println("Enter your rate of Pay  : ")
+        val workerRateOfPay = scan.nextDouble()
+
+        println("Enter number of hours worked : ")
+        val workerHours = scan.nextDouble()
+
+        println("Enter the NSSF Amount: ")
+        val nssfAmount = scan.nextDouble()
+
+        return userInput(workerName,workerRateOfPay,workerHours,nssfAmount)
 }
 
 fun main() {
