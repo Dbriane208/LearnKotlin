@@ -1,7 +1,6 @@
-import java.lang.NumberFormatException
-import java.util.*
-import javax.management.ValueExp
+@file:Suppress("UNUSED_EXPRESSION")
 
+import java.util.*
 fun workerRegistration (name : String ,rateOfPay : Double ,noOfHours : Double , nssfAmount : Double){
 
     println("Enter your name : $name")
@@ -9,7 +8,21 @@ fun workerRegistration (name : String ,rateOfPay : Double ,noOfHours : Double , 
     println("Enter number of hours worked : $noOfHours")
     println("Enter your NSSF Amount : $nssfAmount")
 
+    val basicSalary = basicSalary(rateOfPay, noOfHours)
+    println("Your Basic Salary is : $basicSalary")
+
+    val overtimePay = overtimePay(noOfHours, rateOfPay)
+    println("Your Overtime Pay is : $overtimePay")
+
+    val grossSalary = grossSalary(rateOfPay,noOfHours)
+    println("Your Gross Salary is : $grossSalary")
+
+    val netSalary = netSalary(rateOfPay , noOfHours , nssfAmount)
+    println("Your  Net Salary is : $netSalary ")
+
+
 }
+
 fun grossSalary (rateOfPay: Double,noOfHours: Double):Double{
 
     val basicSalary = basicSalary(rateOfPay, noOfHours)
@@ -22,29 +35,29 @@ fun basicSalary(rateOfPay: Double,noOfHours: Double) : Double{
 
     return rateOfPay * noOfHours
 }
+
 fun overtimePay (noOfHours: Double,rateOfPay: Double) : Double{
-    if (noOfHours > 160){
-        return (noOfHours - 160) * 1.3 * rateOfPay
-    }else{
-        return 0.0
-    }
+    return if (noOfHours > 160)
+            (noOfHours - 160) * 1.3 * rateOfPay
+    else 0.0
 }
+
 fun netSalary (rateOfPay: Double,noOfHours: Double,nssfAmount: Double) : Any{
 
     val grossSalary = grossSalary(rateOfPay,noOfHours)
     val paye = grossSalary * 0.15
 
-    if(nssfAmount > grossSalary){
-        return grossSalary - paye
+    return if(nssfAmount > grossSalary){
+        grossSalary - paye
     }else{
-        return grossSalary - nssfAmount - paye
+        grossSalary - nssfAmount - paye
     }
 
 }
 
-data class userInput (
+data class UserInput (
     val workerName : String,
-    val workerRateOfPlay : Double,
+    val workerRateOfPay : Double,
     val workerHours : Double,
     val nssfAmount: Double
 )
@@ -56,13 +69,14 @@ fun verifyName() : String{
     println("Enter your name : ")
     val workerName  = scan.nextLine()
 
-    if(!workerName.matches(Regex("^[a-zA-Z]*$"))){
-        return "null"
+    return if(!workerName.matches(Regex("^[a-zA-Z]*$"))){
+        "null"
     }else{
-      return  workerName
+        workerName
     }
 }
-fun getUserInput() : userInput{
+
+fun getUserInput() : UserInput{
 
         val scan = Scanner(System.`in`)
 
@@ -77,31 +91,62 @@ fun getUserInput() : userInput{
         println("Enter your rate of Pay  : ")
         val workerRateOfPay = scan.nextDouble()
 
+
         println("Enter number of hours worked : ")
         val workerHours = scan.nextDouble()
 
         println("Enter the NSSF Amount: ")
         val nssfAmount = scan.nextDouble()
 
-        return userInput(workerName,workerRateOfPay,workerHours,nssfAmount)
+        return UserInput(workerName,workerRateOfPay,workerHours,nssfAmount)
+}
+fun storeWorkerData (name: String,nssfAmount: Double,noOfHours: Double,rateOfPay: Double) : ArrayList<UserInput>{
+
+    val workerData = ArrayList<UserInput> ()
+
+    workerData.add(UserInput(name,nssfAmount,noOfHours,rateOfPay))
+
+    return workerData
+}
+data class WorkerSalary(
+    val basicSalary: Double,
+    val grossSalary: Double,
+    val overtimePay: Double,
+    val netSalary: Any
+)
+
+fun workerSalaryDetails(rateOfPay : Double ,noOfHours : Double , nssfAmount : Double) : WorkerSalary {
+
+    val basicSalary = basicSalary(rateOfPay, noOfHours)
+    val overtimePay = overtimePay(noOfHours, rateOfPay)
+    val grossSalary = grossSalary(rateOfPay,noOfHours)
+    val netSalary = netSalary(rateOfPay , noOfHours , nssfAmount)
+
+    return WorkerSalary(basicSalary,grossSalary,overtimePay,netSalary)
 }
 
+fun storeWorkerSalary(rateOfPay : Double ,noOfHours : Double , nssfAmount : Double) : ArrayList<WorkerSalary>{
+
+    val salaryDetails = ArrayList<WorkerSalary>()
+    val salary = workerSalaryDetails(rateOfPay,noOfHours,nssfAmount)
+
+    salaryDetails.add(salary)
+
+    return salaryDetails
+}
 fun main() {
 
         val (name,rateOfPay,noOfHours,nssfAmount) = getUserInput()
 
-        workerRegistration(name,rateOfPay , noOfHours , nssfAmount  )
+        workerRegistration(name,rateOfPay , noOfHours , nssfAmount)
+        workerSalaryDetails(rateOfPay,noOfHours,nssfAmount)
 
-        val basicSalary = basicSalary(rateOfPay, noOfHours)
-        println("Your Basic Salary is : $basicSalary")
 
-        val overtimePay = overtimePay(noOfHours, rateOfPay)
-        println("Your Overtime Pay is : $overtimePay")
+        val userData = storeWorkerData(name,nssfAmount,noOfHours,rateOfPay)
+        println("Worker Registration data is : $userData")
 
-        val grossSalary = grossSalary(rateOfPay,noOfHours)
-        println("Your Gross Salary is : $grossSalary")
-
-        val netSalary = netSalary(rateOfPay , noOfHours , nssfAmount)
-        println("Your  Net Salary is : $netSalary ")
+        val salaryData = storeWorkerSalary(rateOfPay,noOfHours,nssfAmount)
+        println("Worker Salary data is : $salaryData")
 
 }
+
