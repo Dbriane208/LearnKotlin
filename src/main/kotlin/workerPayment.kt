@@ -141,12 +141,10 @@ fun main() {
         workerRegistration(name,rateOfPay , noOfHours , nssfAmount)
         workerSalaryDetails(rateOfPay,noOfHours,nssfAmount)
 
-
         val userData = storeWorkerData(name,nssfAmount,noOfHours,rateOfPay)
         println("Worker Registration data is : $userData")
 
         val salaryData = storeWorkerSalary(rateOfPay,noOfHours,nssfAmount)
         println("Worker Salary data is : $salaryData")
-
 }
 
