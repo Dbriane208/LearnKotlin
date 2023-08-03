@@ -65,10 +65,9 @@ fun sendMoney (userSendMoney : User){
      userSendMoney.accountBalance -= amountToSend
      println("You have Successfully transferred Ksh $amountToSend to Phone Number $receiverPhoneNo. Your new account Balance is Ksh ${userSendMoney.accountBalance} ")
     }else{
-     println(" Transaction failed. Invalid PIN! or recharge your Account Balance!")
+     println(" Transaction failed. Invalid PIN! or recharge your account Balance is too low to complete the transaction.")
     }
 }
-
 fun withdrawCash (userWithdraw : User ){
     val scan = Scanner(System.`in`)
 
@@ -84,10 +83,45 @@ fun withdrawCash (userWithdraw : User ){
      userWithdraw.accountBalance -= amountToWithdraw
      println("You have successfully withdrawn Ksh $amountToWithdraw. Your new account Balance is Ksh ${userWithdraw.accountBalance}")
     }else{
-     println("Invalid PIN! or your Account Balance is to low to complete the withdrawal")
+     println("Invalid PIN! or your Account Balance is to low to complete the withdrawal.")
     }
 }
+fun buyGoods (userBuyGoods : User){
+    val scan = Scanner(System.`in`)
 
+    println(" Option Buy Goods.")
+
+    println("Enter amount for Goods to buy in Ksh:")
+    val goodsAmount = scan.nextInt()
+
+    println("Enter the user pin : ")
+    val userPin = scan.nextInt()
+
+    if(userPin == userBuyGoods.PIN && goodsAmount < userBuyGoods.accountBalance){
+        userBuyGoods.accountBalance -= goodsAmount
+        println("You have successfully purchased Goods worth Ksh $goodsAmount. Your new account Balance is ${userBuyGoods.accountBalance}")
+    }else{
+        println("You have entered Invalid PIN! or your account Balance is to low to complete the transaction.")
+    }
+}
+fun buyAirtime (userBuyAirtime : User){
+    val scan = Scanner(System.`in`)
+
+    println("Option Buy Airtime.")
+
+    println("Enter amount of Credit to buy in Ksh:")
+    val airtimeAmount = scan.nextInt()
+
+    println("Enter the user pin : ")
+    val userPin = scan.nextInt()
+
+    if(userPin == userBuyAirtime.PIN && airtimeAmount < userBuyAirtime.accountBalance){
+        userBuyAirtime.accountBalance -= airtimeAmount
+        println("You have successfully purchase Ksh $airtimeAmount airtime. Your new account Balance is ${userBuyAirtime.accountBalance}")
+    }else{
+        println("You have entered and Invalid PIN! or your Account is to low to complete the transaction.")
+    }
+}
 fun main (){
        val users = userRegistration()
 
@@ -108,4 +142,11 @@ fun main (){
         withdrawCash(users[0])
        }
 
+       if(users.isNotEmpty()){
+           buyGoods(users[0])
+       }
+
+       if(users.isNotEmpty()){
+          buyAirtime(users[0])
+       }
 }
