@@ -1,6 +1,9 @@
 @file:Suppress("UNUSED_EXPRESSION")
 
+import java.io.IOError
 import java.util.*
+import kotlin.system.exitProcess
+
 data class User (
     val name : String,
     val pin : String,
@@ -53,7 +56,7 @@ fun userRegistration (): ArrayList<User>{
             userName
         }else{
             println("Name must be a string! ")
-            System.exit(0)
+            exitProcess(0)
         }
 
         val userPin = verifyUserPinSize()
@@ -61,7 +64,7 @@ fun userRegistration (): ArrayList<User>{
             userPin
         }else{
             println("The userPin must be four digits!")
-            System.exit(0)
+            exitProcess(0)
         }
 
         val userPhoneNo = verifyPhoneNumberLength()
@@ -69,7 +72,7 @@ fun userRegistration (): ArrayList<User>{
             userPhoneNo
         }else{
             println("User phoneNumber should be 10 digits or should start with 07... !")
-            System.exit(0)
+            exitProcess(0)
         }
 
         println("Enter your account Balance in Ksh : ")
@@ -82,6 +85,7 @@ fun userRegistration (): ArrayList<User>{
 }
 fun deposit (userDeposit : User){
         val scan = Scanner(System.`in`)
+         val maxDeposit = 300000
 
         println("Enter the amount to deposit in Ksh : ")
         val deposit = scan.nextDouble()
@@ -89,18 +93,38 @@ fun deposit (userDeposit : User){
         println("Enter the user pin : ")
         val userPin = readln()
 
-        if(userPin == userDeposit.pin){
+        if(userPin == userDeposit.pin && userPin.isNotBlank() && deposit < maxDeposit){
         userDeposit.accountBalance += deposit
         println("You have deposited Ksh $deposit . Your new account Balance is Ksh ${userDeposit.accountBalance}")
         }else{
         println("The PIN entered is INVALID!. Deposit failed.")
         }
 }
+fun verifyReceiversPhoneNumber() : String {
+
+    println("Enter Receiver's phone Number (07..) : ")
+    val receiverPhoneNo = readln()
+
+    return if(receiverPhoneNo.length == 10 && receiverPhoneNo.isNotEmpty() &&
+        receiverPhoneNo.startsWith("07")
+        ){
+        receiverPhoneNo
+    }else{
+        "null"
+    }
+
+}
 fun sendMoney (userSendMoney : User){
        val scan = Scanner(System.`in`)
+       val maxSendMoney = 300000
 
-       println("Enter Receiver's phone Number : ")
-       val receiverPhoneNo = scan.nextInt()
+       val receiverPhoneNo = verifyReceiversPhoneNumber()
+       if (receiverPhoneNo != "null"){
+           receiverPhoneNo
+       }else{
+           println("Receiver's phoneNumber should not be blank!")
+           exitProcess(/* status = */ 0)
+       }
 
        println("Enter Amount you want to Send in Ksh : ")
        val amountToSend = scan.nextDouble()
@@ -108,12 +132,15 @@ fun sendMoney (userSendMoney : User){
        println("Enter the user pin : ")
        val userPin = readln()
 
-      if(userPin == userSendMoney.pin && userSendMoney.accountBalance > amountToSend){
-      userSendMoney.accountBalance -= amountToSend
-      println("You have Successfully transferred Ksh $amountToSend to Phone Number $receiverPhoneNo. Your new account Balance is Ksh ${userSendMoney.accountBalance} ")
-      }else{
-       println(" Transaction failed. Invalid PIN! or recharge your account Balance is too low to complete the transaction.")
-      }
+       if(userPin == userSendMoney.pin && userSendMoney.accountBalance > amountToSend &&
+           receiverPhoneNo != userSendMoney.phoneNumber && amountToSend < maxSendMoney){
+
+       userSendMoney.accountBalance -= amountToSend
+       println("You have Successfully transferred Ksh $amountToSend to Phone Number $receiverPhoneNo. Your new account Balance is Ksh ${userSendMoney.accountBalance} ")
+       println("Your transaction was Successful!")
+       }else{
+        println(" Transaction failed. Invalid PIN! or Low account Balance or Receiver's contact same as your phoneNumber.")
+       }
 }
 fun withdrawCash (userWithdraw : User ){
       val scan = Scanner(System.`in`)
@@ -127,6 +154,7 @@ fun withdrawCash (userWithdraw : User ){
       if(userPin == userWithdraw.pin && userWithdraw.accountBalance > amountToWithdraw){
        userWithdraw.accountBalance -= amountToWithdraw
       println("You have successfully withdrawn Ksh $amountToWithdraw. Your new account Balance is Ksh ${userWithdraw.accountBalance}")
+      println("Your withdrawal was Successful!")
       }else{
        println("Invalid PIN! or your Account Balance is to low to complete the withdrawal.")
       }
@@ -143,25 +171,29 @@ fun buyGoods (userBuyGoods : User){
      if(userPin == userBuyGoods.pin && goodsAmount < userBuyGoods.accountBalance){
         userBuyGoods.accountBalance -= goodsAmount
         println("You have successfully purchased Goods worth Ksh $goodsAmount. Your new account Balance is ${userBuyGoods.accountBalance}")
+        println("Your purchase was Successful!")
      }else{
         println("You have entered Invalid PIN! or your account Balance is to low to complete the transaction.")
      }
 }
 fun buyAirtime (userBuyAirtime : User){
-     val scan = Scanner(System.`in`)
 
-     println("Enter amount of Credit to buy in Ksh:")
-     val airtimeAmount = scan.nextInt()
+        val scan = Scanner(System.`in`)
 
-     println("Enter the user pin : ")
-     val userPin = readln()
+        println("Enter amount of Credit to buy in Ksh:")
+        val airtimeAmount = scan.nextInt()
 
-     if(userPin == userBuyAirtime.pin && airtimeAmount < userBuyAirtime.accountBalance){
-        userBuyAirtime.accountBalance -= airtimeAmount
-        println("You have successfully purchased Ksh $airtimeAmount airtime. Your new account Balance is ${userBuyAirtime.accountBalance}")
-     }else{
-        println("You have entered and Invalid PIN! or your Account is to low to complete the transaction.")
-     }
+        println("Enter the user pin : ")
+        val userPin = readln()
+
+        if(userPin == userBuyAirtime.pin && airtimeAmount < userBuyAirtime.accountBalance && userPin.isNotEmpty()){
+            userBuyAirtime.accountBalance -= airtimeAmount
+            println("You have successfully purchased Ksh $airtimeAmount airtime. Your new account Balance is ${userBuyAirtime.accountBalance}")
+            println("You have successfully purchased your airtime!")
+        }else{
+            println("You have entered and Invalid PIN! or your Account is to low to complete the transaction.")
+        }
+
 }
 fun displayMenu (){
 
@@ -197,9 +229,8 @@ fun main () {
 
             2 -> {
                 if (users.isNotEmpty()) {
-                    for (user in users) {
-                        deposit(user)
-                    }
+                        deposit(users[0])
+                    println("Your Deposit was Successful!")
                 } else {
                     println("There are no registered users!")
                 }
@@ -207,9 +238,7 @@ fun main () {
 
             3 -> {
                 if(users.isNotEmpty()){
-                    for(user in users){
-                        sendMoney(user)
-                    }
+                        sendMoney(users[0])
                 }else{
                     println("There are no registered users!")
                 }
@@ -217,9 +246,7 @@ fun main () {
 
             4 -> {
                 if(users.isNotEmpty()){
-                    for(user in users){
-                        withdrawCash(user)
-                    }
+                        withdrawCash(users[0])
                 }else{
                     println("There are no registered users!")
                 }
@@ -227,9 +254,7 @@ fun main () {
             }
             5 -> {
                 if(users.isNotEmpty()){
-                for(user in users){
-                    buyGoods(user)
-                }
+                    buyGoods(users[0])
                 }else{
                 println("There are no registered users!")
                 }
@@ -237,9 +262,7 @@ fun main () {
 
             6 -> {
                 if(users.isNotEmpty()){
-                    for(user in users){
-                     buyAirtime(user)
-                    }
+                     buyAirtime(users[0])
                 }else{
                     println("There are no registered users!")
                 }
@@ -258,7 +281,7 @@ fun main () {
 
             8 -> {
                 println("You have successfully exited the system. See you soon!")
-                System.exit(0)
+                exitProcess(0)
             }
 
             else -> {
