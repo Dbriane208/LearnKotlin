@@ -1,6 +1,5 @@
-@file:Suppress("UNUSED_EXPRESSION")
+@file:Suppress("UNUSED_EXPRESSION", "NAME_SHADOWING")
 
-import java.io.IOError
 import java.util.*
 import kotlin.system.exitProcess
 
@@ -83,23 +82,32 @@ fun userRegistration (): ArrayList<User>{
 
  return users
 }
-fun deposit (userDeposit : User){
-        val scan = Scanner(System.`in`)
-         val maxDeposit = 300000
+fun selectUserChoice(users :ArrayList<User> ): User?{
+    val scan = Scanner(System.`in`)
 
-        println("Enter the amount to deposit in Ksh : ")
-        val deposit = scan.nextDouble()
+    println("Select registered user")
+    val userSelected = scan.nextInt()
+
+   return  if(userSelected in 1 ..users.size){
+       users[userSelected-1]
+   }else{
+       println("Invalid Choice!")
+       null
+   }
+}
+fun deposit (userDeposit : User,amount:Double){
+        val maxDeposit = 300000
 
         println("Enter the user pin : ")
         val userPin = readln()
 
-        if(userPin == userDeposit.pin && userPin.isNotBlank() && deposit < maxDeposit){
-        userDeposit.accountBalance += deposit
-        println("You have deposited Ksh $deposit . Your new account Balance is Ksh ${userDeposit.accountBalance}")
+        if(userPin == userDeposit.pin && userPin.isNotBlank() && amount < maxDeposit){
+               userDeposit.accountBalance += amount
+               println("You have deposited Ksh $amount . Your new account Balance is Ksh ${userDeposit.accountBalance}")
         }else{
-        println("The PIN entered is INVALID!. Deposit failed.")
+               println("The PIN entered is INVALID!. Deposit failed.")
         }
-}
+    }
 fun verifyReceiversPhoneNumber() : String {
 
     println("Enter Receiver's phone Number (07..) : ")
@@ -114,8 +122,7 @@ fun verifyReceiversPhoneNumber() : String {
     }
 
 }
-fun sendMoney (userSendMoney : User){
-       val scan = Scanner(System.`in`)
+fun sendMoney (userSendMoney : User,amountToSend : Double){
        val maxSendMoney = 300000
 
        val receiverPhoneNo = verifyReceiversPhoneNumber()
@@ -125,9 +132,6 @@ fun sendMoney (userSendMoney : User){
            println("Receiver's phoneNumber should not be blank!")
            exitProcess(/* status = */ 0)
        }
-
-       println("Enter Amount you want to Send in Ksh : ")
-       val amountToSend = scan.nextDouble()
 
        println("Enter the user pin : ")
        val userPin = readln()
@@ -142,12 +146,7 @@ fun sendMoney (userSendMoney : User){
         println(" Transaction failed. Invalid PIN! or Low account Balance or Receiver's contact same as your phoneNumber.")
        }
 }
-fun withdrawCash (userWithdraw : User ){
-      val scan = Scanner(System.`in`)
-
-      println("Enter Amount you want to withdraw in Ksh : ")
-      val amountToWithdraw = scan.nextDouble()
-
+fun withdrawCash (userWithdraw : User ,amountToWithdraw : Double){
       println("Enter the user pin : ")
       val userPin = readln()
 
@@ -159,12 +158,7 @@ fun withdrawCash (userWithdraw : User ){
        println("Invalid PIN! or your Account Balance is to low to complete the withdrawal.")
       }
 }
-fun buyGoods (userBuyGoods : User){
-     val scan = Scanner(System.`in`)
-
-     println("Enter amount for Goods to buy in Ksh:")
-     val goodsAmount = scan.nextInt()
-
+fun buyGoods (userBuyGoods : User,goodsAmount : Double){
      println("Enter the user pin : ")
      val userPin = readln()
 
@@ -176,13 +170,7 @@ fun buyGoods (userBuyGoods : User){
         println("You have entered Invalid PIN! or your account Balance is to low to complete the transaction.")
      }
 }
-fun buyAirtime (userBuyAirtime : User){
-
-        val scan = Scanner(System.`in`)
-
-        println("Enter amount of Credit to buy in Ksh:")
-        val airtimeAmount = scan.nextInt()
-
+fun buyAirtime (userBuyAirtime : User,airtimeAmount : Double){
         println("Enter the user pin : ")
         val userPin = readln()
 
@@ -229,8 +217,13 @@ fun main () {
 
             2 -> {
                 if (users.isNotEmpty()) {
-                        deposit(users[0])
-                    println("Your Deposit was Successful!")
+                    val scan = Scanner(System.`in`)
+                    val selectedUser = selectUserChoice(users)
+                    if (selectedUser != null) {
+                        println("Enter Amount to deposit in Ksh :")
+                        val amount = scan.nextDouble()
+                        deposit(selectedUser,amount)
+                    }
                 } else {
                     println("There are no registered users!")
                 }
@@ -238,7 +231,13 @@ fun main () {
 
             3 -> {
                 if(users.isNotEmpty()){
-                        sendMoney(users[0])
+                    val scan = Scanner(System.`in`)
+                    val selectedUser = selectUserChoice(users)
+                    if(selectedUser != null){
+                        println("Enter Amount you want to Send in Ksh :")
+                        val amountToSend = scan.nextDouble()
+                        sendMoney(selectedUser,amountToSend)
+                    }
                 }else{
                     println("There are no registered users!")
                 }
@@ -246,15 +245,27 @@ fun main () {
 
             4 -> {
                 if(users.isNotEmpty()){
-                        withdrawCash(users[0])
+                    val scan = Scanner(System.`in`)
+                    val selectedUser = selectUserChoice(users)
+                    if(selectedUser != null){
+                        println("Enter Amount you want to withdraw in Ksh :")
+                        val amountToWithdraw = scan.nextDouble()
+                        withdrawCash(selectedUser,amountToWithdraw)
+                    }
                 }else{
                     println("There are no registered users!")
                 }
-
             }
+
             5 -> {
                 if(users.isNotEmpty()){
-                    buyGoods(users[0])
+                    val scan = Scanner(System.`in`)
+                    val selectedUser = selectUserChoice(users)
+                    if(selectedUser != null){
+                        println("Enter amount for Goods to buy in Ksh:")
+                        val goodsAmount = scan.nextDouble()
+                        buyGoods(selectedUser,goodsAmount)
+                    }
                 }else{
                 println("There are no registered users!")
                 }
@@ -262,7 +273,13 @@ fun main () {
 
             6 -> {
                 if(users.isNotEmpty()){
-                     buyAirtime(users[0])
+                    val scan = Scanner(System.`in`)
+                    val selectedUser = selectUserChoice(users)
+                    if(selectedUser != null){
+                        println("Enter amount of Credit to buy in Ksh:")
+                        val airtimeAmount = scan.nextDouble()
+                        buyAirtime(selectedUser,airtimeAmount)
+                    }
                 }else{
                     println("There are no registered users!")
                 }
